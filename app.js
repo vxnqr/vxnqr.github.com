@@ -86,8 +86,10 @@
   } catch (e) { /* storage may be blocked — default ru */ }
 
   function buildTicker() {
+    const tr = $("#ticker-track");
+    if (!tr) return; // бегущей строки на странице больше нет
     const t = I18N[lang].ticker;
-    $("#ticker-track").innerHTML = `<span>${t.repeat(2)}</span><span>${t.repeat(2)}</span>`;
+    tr.innerHTML = `<span>${t.repeat(2)}</span><span>${t.repeat(2)}</span>`;
   }
 
   function applyLang(next) {
