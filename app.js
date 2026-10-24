@@ -66,7 +66,7 @@
   const prm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- i18n ---------- */
-  dbgEarly = function (t) {
+  const dbgEarly = function (t) {
     const d = document.getElementById("works-debug");
     if (d) { d.style.display = "block"; d.textContent = t; }
   };
