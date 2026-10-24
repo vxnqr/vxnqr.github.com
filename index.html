@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>InvoidHunter — монтаж видео и игр</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <script type="application/json" id="media-list-fallback">[{"name":"baobabiks tik tok.mp4"},{"name":"baobabiks tik tok.jpg"},{"name":"BENZINOBOSS.mp4"},{"name":"BENZINOBOSS.jpg"},{"name":"keryllon.mp4"},{"name":"keryllon.jpg"}]</script>
 <meta name="description" content="Монтаж видео и игр: клипы, шорты, трейлеры. Канал t.me/invoidhunter — живые примеры работ.">
 <meta property="og:title" content="InvoidHunter — монтаж видео и игр">
 <meta property="og:description" content="Клипы, шорты, трейлеры — плотный рез, бит в синхроне, хук за 3 секунды.">
 <meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="styles.css">
+<script type="application/json" id="media-list-fallback">[{"name":"baobabiks_tik_tok.mp4"},{"name":"baobabiks_tik_tok.jpg"},{"name":"BENZINOBOSS.mp4"},{"name":"BENZINOBOSS.jpg"},{"name":"keryllon.mp4"},{"name":"keryllon.jpg"}]</script>
 </head>
 <body>
 
@@ -18,6 +18,14 @@
 <div class="blob blob-2" aria-hidden="true"></div>
 <div class="blob blob-3" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
+
+<!-- слева: 3D-камера, следит за курсором (camera3d.js) · справа: таймлайн с REC -->
+<div class="cam3d" id="cam3d" aria-hidden="true"></div>
+<aside class="rail rail-right" aria-hidden="true">
+  <span class="rec"><i></i>REC</span>
+  <div class="track"><div class="playhead"></div></div>
+  <span class="timecode" id="timecode">00:00:00</span>
+</aside>
 
 <header class="topbar glass">
   <a class="logo chrome" href="#top">InvoidHunter</a>
@@ -55,25 +63,12 @@
 
   <!-- TICKER -->
   <div class="ticker" aria-hidden="true">
-    <div class="ticker-track" id="ticker-track">
-      <span>МОНТАЖ ВИДЕО ✦ ИГРОВЫЕ ТРЕЙЛЕРЫ ✦ ЭКШН-РЕЗЫ ✦ SFX ✦ ШОРТС И РЕЛЫ ✦ ПРЕВЬЮ ✦ ДАВИНЧИ ✦ СИНХРОН БИТА ✦ </span>
-      <span>МОНТАЖ ВИДЕО ✦ ИГРОВЫЕ ТРЕЙЛЕРЫ ✦ ЭКШН-РЕЗЫ ✦ SFX ✦ ШОРТС И РЕЛЫ ✦ ПРЕВЬЮ ✦ ДАВИНЧИ ✦ СИНХРОН БИТА ✦ </span>
-    </div>
+    <div class="ticker-track" id="ticker-track"></div>
   </div>
 
   <!-- WORKS -->
-  <section id="works" class="section">
+  <section id="works" class="section section-works">
     <h2 class="h2 chrome" data-i18n="works_h">РАБОТЫ</h2>
-    <div id="works-debug" style="display:none;font:12px/1.5 monospace;color:#ff9de2;padding:4px 2px;text-shadow:0 0 8px rgba(255,43,214,.4)"></div>
-    <script>
-      (function () {
-        var d = document.getElementById("works-debug");
-        if (d) { d.style.display = "block"; d.textContent = "HTML ok, жду app.js..."; }
-        window.addEventListener("error", function (ev) {
-          if (d) { d.style.display = "block"; d.textContent = "JS ошибка: " + ev.message + (ev.lineno ? " || app.js:" + ev.lineno : ""); }
-        });
-      })();
-    </script>
     <div class="grid" id="works-grid"></div>
     <div class="empty glass" id="works-empty" hidden>
       <p data-i18n="works_empty_1">Пока пусто. Закинь файлы (.mp4 / .webm / .png / .jpg) в папку <b>media</b> рядом с сайтом и обнови страницу.</p>
@@ -87,13 +82,13 @@
       <article class="service glass tilt-l">
         <div class="s-icon" aria-hidden="true">🎬</div>
         <h3 data-i18n="s1_t">КЛИПЫ И РОЛИКИ</h3>
-        <p data-i18n="s1_d">Плотный рез, динамика под бит, цвет и чистая драность — видео, которое дожимают до конца.</p>
+        <p data-i18n="s1_d">Плотный рез, динамика под бит, цвет и та самая грязь — видео, которое дожимают до конца.</p>
         <span class="price" data-i18n="s1_p">от 1 000 ₽</span>
       </article>
       <article class="service glass tilt-r">
         <div class="s-icon" aria-hidden="true">🎮</div>
         <h3 data-i18n="s2_t">ИГРОВОЙ МОНТАЖ</h3>
-        <p data-i18n="s2_d">Летсплеи, скилл-мешапы, клипы по моментам: тайминги под эмоции, не под реtac.</p>
+        <p data-i18n="s2_d">Летсплеи, скилл-мешапы, клипы по моментам: тайминги под эмоции, а не по шаблону.</p>
         <span class="price" data-i18n="s2_p">от 1 500 ₽</span>
       </article>
       <article class="service glass tilt-l">
@@ -111,18 +106,41 @@
     </div>
   </section>
 
-  <!-- ABOUT (CTA only) -->
-  <section id="about" class="section about">
-    <a class="btn btn-acid" href="https://t.me/invoidhunter" target="_blank" rel="noopener" data-i18n="cta_join">ПОДПИСАТЬСЯ ➤</a>
-  </section>
-
 </main>
 
-<footer class="footer">
-  <span>© <span id="year">2026</span> InvoidHunter · t.me/invoidhunter</span>
+<!-- FOOTER (он же «о канале») -->
+<footer class="footer" id="about">
+  <div class="footer-main glass">
+    <div class="footer-col footer-brand">
+      <a class="logo chrome" href="#top">InvoidHunter</a>
+      <p data-i18n="footer_tag">Монтаж видео и игр: клипы, шорты, трейлеры.</p>
+      <nav class="footer-links" aria-label="footer">
+        <a href="#works" data-i18n="nav_works">работы</a>
+        <a href="#services" data-i18n="nav_services">услуги</a>
+        <a href="https://t.me/invoidhunter" target="_blank" rel="noopener">t.me/invoidhunter</a>
+      </nav>
+    </div>
+
+    <div class="footer-col footer-about">
+      <h3 data-i18n="footer_about_h">О КАНАЛЕ</h3>
+      <p data-i18n="footer_about_d">InvoidHunter — канал про монтаж видео и игровых роликов. Здесь свежие работы и приём заказов: клипы, шортсы, трейлеры, превью. Подпишись и напиши в Telegram — обсудим задачу и сроки.</p>
+    </div>
+
+    <div class="footer-col footer-cta">
+      <a class="btn btn-acid" href="https://t.me/invoidhunter" target="_blank" rel="noopener" data-i18n="cta_join">ПОДПИСАТЬСЯ ➤</a>
+      <p class="footer-hint" data-i18n="footer_hint">Новые работы и заказы — в Telegram.</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> InvoidHunter</span>
+    <span>t.me/invoidhunter</span>
+  </div>
 </footer>
 
-<script src="app.js?v=20261025d"></script>
+<script src="three.min.js"></script>
+<script src="camera3d.js?v=2"></script>
+<script src="app.js?v=20261025h"></script>
 
 </body>
 </html>
