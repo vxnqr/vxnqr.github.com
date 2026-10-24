@@ -3,6 +3,8 @@
   "use strict";
 
   const MEDIA_DIR = "media/"; // где лежат .mp4 / .jpg. Если файлы в корне сайта — поставь ""
+  const STAMP = window.__BUST || Date.now();
+  const kBustMedia = false; // true = и видео/постеры перекачиваются при каждом заходе (тяжело по трафику)
 
   const I18N = {
     ru: {
@@ -140,7 +142,7 @@
     return dot > 0 ? name.slice(0, dot) : name;
   };
   const niceName = name => baseOf(name); // подпись = имя файла без расширения, как есть
-  const mediaUrl = name => MEDIA_DIR + encodeURIComponent(name);
+  const mediaUrl = name => MEDIA_DIR + encodeURIComponent(name) + (kBustMedia ? "?v=" + STAMP : "");
 
   function muteOthers(active) {
     $$(".work video", grid).forEach(v => { if (v !== active) v.muted = true; });
@@ -325,7 +327,7 @@
   })();
 
   function renderWithTg(list) {
-    return fetch("media_manifest.json")
+    return fetch("media_manifest.json?v=" + STAMP, { cache: "no-store" })
       .then(r => (r.ok ? r.json() : {}))
       .catch(() => ({}))
       .then(tg => {

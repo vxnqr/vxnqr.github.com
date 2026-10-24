@@ -2,6 +2,21 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>
+/* сброс кеша при каждом заходе: css/js грузятся с уникальным ?v=, плюс чистим Cache Storage и service worker'ы */
+window.__BUST = Date.now();
+(function () {
+  try {
+    if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); });
+    if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); });
+  } catch (e) { /* не критично */ }
+  document.write('<link rel="stylesheet" href="styles.css?v=' + window.__BUST + '">');
+})();
+</script>
+<noscript><link rel="stylesheet" href="styles.css"></noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>InvoidHunter — монтаж видео и игр</title>
 <meta name="description" content="Монтаж видео и игр: клипы, шорты, трейлеры. Канал t.me/invoidhunter — живые примеры работ.">
@@ -9,7 +24,6 @@
 <meta property="og:description" content="Клипы, шорты, трейлеры — плотный рез, бит в синхроне, хук за 3 секунды.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/png" href="favicon.png">
-<link rel="stylesheet" href="styles.css">
 <script type="application/json" id="media-list-fallback">[{"name":"baobabiks_tik_tok.mp4"},{"name":"baobabiks_tik_tok.jpg"},{"name":"BENZINOBOSS.mp4"},{"name":"BENZINOBOSS.jpg"},{"name":"keryllon.mp4"},{"name":"keryllon.jpg"}]</script>
 </head>
 <body>
@@ -138,9 +152,15 @@
   </div>
 </footer>
 
-<script src="three.min.js"></script>
-<script src="camera3d.js?v=2"></script>
-<script src="app.js?v=20261025h"></script>
+<script>
+/* порядок выполнения сохраняется (async=false), каждый файл с уникальным ?v= */
+["three.min.js", "camera3d.js", "app.js"].forEach(function (src) {
+  var el = document.createElement("script");
+  el.src = src + "?v=" + window.__BUST;
+  el.async = false;
+  document.body.appendChild(el);
+});
+</script>
 
 </body>
 </html>
