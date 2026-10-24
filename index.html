@@ -65,6 +65,15 @@
   <section id="works" class="section">
     <h2 class="h2 chrome" data-i18n="works_h">РАБОТЫ</h2>
     <div id="works-debug" style="display:none;font:12px/1.5 monospace;color:#ff9de2;padding:4px 2px;text-shadow:0 0 8px rgba(255,43,214,.4)"></div>
+    <script>
+      (function () {
+        var d = document.getElementById("works-debug");
+        if (d) { d.style.display = "block"; d.textContent = "HTML ok, жду app.js..."; }
+        window.addEventListener("error", function (ev) {
+          if (d) { d.style.display = "block"; d.textContent = "JS ошибка: " + ev.message + (ev.lineno ? " || app.js:" + ev.lineno : ""); }
+        });
+      })();
+    </script>
     <div class="grid" id="works-grid"></div>
     <div class="empty glass" id="works-empty" hidden>
       <p data-i18n="works_empty_1">Пока пусто. Закинь файлы (.mp4 / .webm / .png / .jpg) в папку <b>media</b> рядом с сайтом и обнови страницу.</p>
