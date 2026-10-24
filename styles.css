@@ -196,6 +196,27 @@ body {
 .work-sound:hover { transform: scale(1.12); }
 .work-sound.is-off { filter: grayscale(1) opacity(.55); }
 
+.work-vol {
+  position: absolute; right: 58px; bottom: 38px;
+  width: 96px; height: 6px; border-radius: 999px;
+  -webkit-appearance: none; appearance: none;
+  background: linear-gradient(90deg, var(--lime) var(--p, 100%), rgba(255, 255, 255, .28) var(--p, 100%));
+  border: none; cursor: pointer; z-index: 3;
+  opacity: 0; transition: opacity .2s ease;
+}
+.work:hover .work-vol, .work-vol:focus-visible, .work-vol:active { opacity: 1; }
+@media (hover: none) { .work-vol { opacity: .9; } } /* на таче hover'а нет — показываем всегда */
+.work-vol::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--cyan); border: 2px solid var(--ink);
+  box-shadow: 0 0 10px var(--acid);
+}
+.work-vol::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--cyan); border: 2px solid var(--ink);
+}
+
 .work-fs {
   position: absolute; right: 12px; top: 12px;
   width: 38px; height: 38px; border-radius: 50%;

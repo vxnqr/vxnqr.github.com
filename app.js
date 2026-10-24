@@ -146,6 +146,24 @@
   const niceName = name => baseOf(name); // подпись = имя файла без расширения, как есть
   const mediaUrl = name => MEDIA_DIR + encodeURIComponent(name) + (kBustMedia ? "?v=" + STAMP : "");
 
+  /* ---------- громкость: один уровень на все видео, запоминается ---------- */
+  let volume = 1;
+  try {
+    const sv = parseFloat(localStorage.getItem("ivh-vol"));
+    if (isFinite(sv) && sv > 0 && sv <= 1) volume = sv;
+  } catch (e) { /* storage may be blocked */ }
+  const saveVol = () => { try { localStorage.setItem("ivh-vol", String(volume)); } catch (e) { /* non-critical */ } };
+  const canSetVol = (() => { // iOS Safari не даёт менять video.volume — там ползунок не нужен
+    const probe = document.createElement("video");
+    probe.volume = 0.5;
+    return probe.volume === 0.5;
+  })();
+  function setVolume(x) {
+    volume = Math.max(0, Math.min(1, x));
+    saveVol();
+    $$(".work video", grid).forEach(el => { el.volume = volume; });
+  }
+
   function muteOthers(active) {
     $$(".work video", grid).forEach(v => { if (v !== active) v.muted = true; });
   }
@@ -189,6 +207,7 @@
     v.loop = true;
     v.muted = true;
     v.setAttribute("muted", "");       // без атрибута часть браузеров блокирует автоплей
+    v.volume = volume;
     v.playsInline = true;
     v.setAttribute("playsinline", "");
     if (posterName) v.poster = mediaUrl(posterName);
@@ -198,18 +217,44 @@
     snd.className = "work-sound is-off";
     snd.textContent = "🔇";
     snd.setAttribute("aria-label", "sound");
-    v.addEventListener("volumechange", () => {
-      snd.classList.toggle("is-off", v.muted);
-      snd.textContent = v.muted ? "🔇" : "🔊";
+    const vol = document.createElement("input");
+    vol.type = "range";
+    vol.className = "work-vol";
+    vol.min = "0"; vol.max = "100"; vol.step = "1";
+    vol.setAttribute("aria-label", "volume");
+    ["pointerdown", "pointermove", "click", "touchstart"].forEach(ev =>
+      vol.addEventListener(ev, e => e.stopPropagation()));
+    vol.addEventListener("input", () => {
+      const x = parseFloat(vol.value) / 100;
+      if (x > 0) {
+        setVolume(x);
+        v.muted = false;
+        muteOthers(v);                   // звучит одно видео за раз
+        if (v.paused) v.play().catch(() => {});
+      } else {
+        v.muted = true;                  // ползунок в ноль = mute (уровень остаётся в памяти)
+      }
     });
+    const syncVol = () => {
+      const off = v.muted || v.volume === 0;
+      snd.classList.toggle("is-off", off);
+      snd.textContent = off ? "🔇" : "🔊";
+      const lvl = Math.round((v.muted ? 0 : v.volume) * 100);
+      vol.value = String(lvl);
+      vol.style.setProperty("--p", lvl + "%");
+      if (!v.muted && v.volume > 0 && v.volume !== volume) { volume = v.volume; saveVol(); } // нативные контролы в полном экране
+    };
+    v.addEventListener("volumechange", syncVol);
     snd.addEventListener("click", e => {
       e.stopPropagation();
       v.muted = !v.muted;
       if (!v.muted) {
+        if (volume < 0.05) setVolume(0.6);
         muteOthers(v);
         if (v.paused) v.play().catch(() => {});
       }
     });
+    syncVol();
 
     const fs = document.createElement("button");
     fs.type = "button";
@@ -272,6 +317,7 @@
     });
 
     card.append(v, snd, fs, badge, time);
+    if (canSetVol) card.append(vol);
     if (playIO) playIO.observe(v);
     return card;
   }
