@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>InvoidHunter — монтаж видео и игр</title>
   <link rel="icon" type="image/png" href="favicon.png">
+  <script type="application/json" id="media-list-fallback">[{"name":"baobabiks tik tok.mp4"},{"name":"baobabiks tik tok.jpg"},{"name":"BENZINOBOSS.mp4"},{"name":"BENZINOBOSS.jpg"},{"name":"keryllon.mp4"},{"name":"keryllon.jpg"}]</script>
 <meta name="description" content="Монтаж видео и игр: клипы, шорты, трейлеры. Канал t.me/invoidhunter — живые примеры работ.">
 <meta property="og:title" content="InvoidHunter — монтаж видео и игр">
 <meta property="og:description" content="Клипы, шорты, трейлеры — плотный рез, бит в синхроне, хук за 3 секунды.">
@@ -63,6 +64,7 @@
   <!-- WORKS -->
   <section id="works" class="section">
     <h2 class="h2 chrome" data-i18n="works_h">РАБОТЫ</h2>
+    <div id="works-debug" style="display:none;font:12px/1.5 monospace;color:#ff9de2;padding:4px 2px;text-shadow:0 0 8px rgba(255,43,214,.4)"></div>
     <div class="grid" id="works-grid"></div>
     <div class="empty glass" id="works-empty" hidden>
       <p data-i18n="works_empty_1">Пока пусто. Закинь файлы (.mp4 / .webm / .png / .jpg) в папку <b>media</b> рядом с сайтом и обнови страницу.</p>
@@ -112,6 +114,6 @@
 </footer>
 
 <script src="app.js"></script>
-<script type="application/json" id="media-list-fallback">[{"name":"baobabiks tik tok.mp4"},{"name":"baobabiks tik tok.jpg"},{"name":"BENZINOBOSS.mp4"},{"name":"BENZINOBOSS.jpg"},{"name":"keryllon.mp4"},{"name":"keryllon.jpg"}]</script>
+
 </body>
 </html>
