@@ -66,6 +66,11 @@
   const prm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- i18n ---------- */
+  dbgEarly = function (t) {
+    const d = document.getElementById("works-debug");
+    if (d) { d.style.display = "block"; d.textContent = t; }
+  };
+  dbgEarly("app.js: живой, старт");
   let lang = "ru";
   try {
     const saved = localStorage.getItem("ivh-lang");
