@@ -1,4 +1,4 @@
-﻿/* invoidhunter — app logic: i18n RU/EN, works grid, reveal-on-scroll */
+/* invoidhunter — app logic: i18n RU/EN, works grid, reveal-on-scroll */
 (() => {
   "use strict";
 
@@ -250,16 +250,30 @@
     }
   }
 
-  fetch("media_list.json")
-    .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
-    .then(list => fetch("media_manifest.json")
+  // fallback: если список с CDN не доехал (кэш провайдера, миг между коммитами) — вшитый минимум
+  const FALLBACK_LIST = function () {
+    try { return JSON.parse(document.getElementById("media-list-fallback").textContent); }
+    catch (e) { return []; }
+  }();
+
+  function renderWithTg(list) {
+    return fetch("media_manifest.json")
       .then(r => (r.ok ? r.json() : {}))
       .catch(() => ({}))
       .then(tg => render(list.map(x => {
         const u = tg[x.name];
         return u ? { ...x, tg: typeof u === "string" ? u : u.url } : x;
-      }))))
-    .catch(() => { emptyBox.hidden = false; });
+      })));
+  }
+
+  // ?nocache=x ломает кэш на пути (провайдерский CDN может держать протухший 404)
+  fetch("media_list.json?nocache=" + Date.now())
+    .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then(list => renderWithTg(list.length ? list : FALLBACK_LIST))
+    .catch(() => {
+      if (FALLBACK_LIST.length) renderWithTg(FALLBACK_LIST);
+      else emptyBox.hidden = false;
+    });
 
   /* ---------- services: мягкий заход и мягкий выход из вайла ---------- */
   $$(".service").forEach(s => {
