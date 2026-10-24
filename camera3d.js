@@ -134,8 +134,9 @@
   const T = window.THREE;
   if (!host || !T) return;
 
-  const mq = window.matchMedia("(min-width: 1400px)");
-  const prm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mq = window.matchMedia("(min-width: 700px)");
+  const kIgnoreReducedMotion = true; // true = камера следит за курсором, даже если в Windows/браузере отключены анимации
+  const prm = !kIgnoreReducedMotion && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let started = false;
 
   function start() {
@@ -188,16 +189,18 @@
       return ray.intersectObjects([wrap, stand], true).length > 0;
     }
 
+    // камера «за фоном»: клики по интерактиву и стеклянным панелям её не трогают
+    const interactive = t => !!(t && t.closest && t.closest("a, button, input, video, .work, .service, .glass, .chip, .ticker"));
+
     const bubble = document.createElement("div");
     bubble.className = "cam-bubble";
     bubble.setAttribute("aria-hidden", "true");
     document.body.appendChild(bubble);
     let hideTimer = 0;
-    function say(text) {
-      const r = host.getBoundingClientRect();
+    function say(text, x, y) { // реплика появляется у курсора
       bubble.textContent = text;
-      bubble.style.left = Math.max(8, r.left + 8) + "px";
-      bubble.style.bottom = (window.innerHeight - (r.top + r.height * 0.2)) + "px";
+      bubble.style.left = Math.max(8, Math.min(window.innerWidth - 238, x - 30)) + "px";
+      bubble.style.bottom = Math.min(window.innerHeight - 60, window.innerHeight - y + 16) + "px";
       bubble.classList.remove("show");
       void bubble.offsetWidth; // перезапуск анимации при повторном клике
       bubble.classList.add("show");
@@ -207,14 +210,14 @@
 
     let kick = 0, spin = 0;
     window.addEventListener("click", e => {
-      if (!hit(e.clientX, e.clientY)) return;
+      if (interactive(e.target) || !hit(e.clientX, e.clientY)) return;
       const m = nextMessage();
-      say(m.text);
+      say(m.text, e.clientX, e.clientY);
       kick = 1;
       if (m.spin) spin = Math.PI * 2;
     });
     window.addEventListener("pointermove", e => {
-      document.documentElement.classList.toggle("cam-hover", hit(e.clientX, e.clientY));
+      document.documentElement.classList.toggle("cam-hover", !interactive(e.target) && hit(e.clientX, e.clientY));
     }, { passive: true });
 
     const aim = new T.Object3D();

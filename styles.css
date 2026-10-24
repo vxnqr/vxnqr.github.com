@@ -335,14 +335,26 @@ body {
 
 /* ---------- 3D-камера слева (только на широких экранах) ---------- */
 .cam3d {
-  display: none;
-  position: fixed; z-index: 1; left: 0; bottom: 16px;
-  width: clamp(90px, calc((100vw - 1180px) / 2 - 12px), 260px);
+  position: fixed; z-index: 0; left: 50%; top: 50%;   /* за контентом, под блобами и звёздами */
+  translate: -50% -50%;
+  width: min(72vw, 62vh, 780px);
   aspect-ratio: 1 / 1.25;
   pointer-events: none;
+  filter: blur(4px) saturate(1.3) brightness(1.5);                  /* «глаз» из-за стекла */
+  opacity: .85;
 }
 .cam3d canvas { width: 100%; height: 100%; display: block; }
 html.cam-hover, html.cam-hover body { cursor: pointer; } /* курсор-«рука» над моделью камеры */
+
+/* ---------- 3D-плёнка по бокам: за фоном, в блюре ---------- */
+.film3d {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  filter: blur(3px) saturate(1.2) brightness(1.25);
+  opacity: .7;
+}
+.film3d canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 699px) { .film3d { display: none; } }
 
 /* реплика камеры по клику */
 .cam-bubble {
@@ -362,7 +374,7 @@ html.cam-hover, html.cam-hover body { cursor: pointer; } /* курсор-«ру�
   rotate: 45deg;
 }
 .cam-bubble.show { opacity: 1; translate: 0 0; scale: 1; }
-@media (min-width: 1400px) { .cam3d { display: block; } }
+@media (max-width: 699px) { .cam3d { display: none; } }
 
 /* ---------- правая рейка: таймлайн + REC (только на широких экранах) ---------- */
 .rail {

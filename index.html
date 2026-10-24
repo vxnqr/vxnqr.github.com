@@ -28,13 +28,16 @@ window.__BUST = Date.now();
 </head>
 <body>
 
+<!-- 3D-плёнка по бокам (film3d.js): фон, блюр, реагирует на скролл -->
+<div class="film3d" id="film3d" aria-hidden="true"></div>
+<!-- 3D-камера: фон-«глаз», следит за курсором (camera3d.js) — до блобов, чтобы они перекрывали её -->
+<div class="cam3d" id="cam3d" aria-hidden="true"></div>
 <div class="blob blob-1" aria-hidden="true"></div>
 <div class="blob blob-2" aria-hidden="true"></div>
 <div class="blob blob-3" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
 
 <!-- слева: 3D-камера, следит за курсором (camera3d.js) · справа: таймлайн с REC -->
-<div class="cam3d" id="cam3d" aria-hidden="true"></div>
 <aside class="rail rail-right" aria-hidden="true">
   <span class="rec"><i></i>REC</span>
   <div class="track"><div class="playhead"></div></div>
@@ -154,7 +157,7 @@ window.__BUST = Date.now();
 
 <script>
 /* порядок выполнения сохраняется (async=false), каждый файл с уникальным ?v= */
-["three.min.js", "camera3d.js", "app.js"].forEach(function (src) {
+["three.min.js", "camera3d.js", "film3d.js", "app.js"].forEach(function (src) {
   var el = document.createElement("script");
   el.src = src + "?v=" + window.__BUST;
   el.async = false;
