@@ -256,24 +256,43 @@
     catch (e) { return []; }
   }();
 
+  function dbgMsg(t) {
+    const d = document.getElementById("works-debug");
+    if (!d) return;
+    d.textContent = t;
+    d.style.display = t ? "block" : "none";
+  }
+
   function renderWithTg(list) {
     return fetch("media_manifest.json")
       .then(r => (r.ok ? r.json() : {}))
       .catch(() => ({}))
-      .then(tg => render(list.map(x => {
-        const u = tg[x.name];
-        return u ? { ...x, tg: typeof u === "string" ? u : u.url } : x;
-      })));
+      .then(tg => {
+        dbgMsg("");
+        render(list.map(x => {
+          const u = tg[x.name];
+          return u ? { ...x, tg: typeof u === "string" ? u : u.url } : x;
+        }));
+      });
   }
 
   // ?nocache=x ломает кэш на пути (провайдерский CDN может держать протухший 404)
-  fetch("media_list.json?nocache=" + Date.now())
-    .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+  const ctrl = new AbortController();
+  const kill = setTimeout(() => ctrl.abort(), 9000);
+  dbgMsg("media: загружаю список...");
+  fetch("media_list.json?nocache=" + Date.now(), { cache: "no-store", signal: ctrl.signal })
+    .then(r => {
+      clearTimeout(kill);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
     .then(list => renderWithTg(list.length ? list : FALLBACK_LIST))
-    .catch(() => {
-      if (FALLBACK_LIST.length) renderWithTg(FALLBACK_LIST);
-      else emptyBox.hidden = false;
+    .catch(e => {
+      if (FALLBACK_LIST.length) { dbgMsg("media: CDN не отдал (" + (e && e.message || e) + "), играю из вшитого"); renderWithTg(FALLBACK_LIST); }
+      else { emptyBox.hidden = false; dbgMsg("media_list: " + (e && e.message || e)); }
     });
+
+  window.addEventListener("error", ev => dbgMsg("JS error: " + ev.message + " @" + (ev.filename || "").slice(-24) + ":" + ev.lineno));
 
   /* ---------- services: мягкий заход и мягкий выход из вайла ---------- */
   $$(".service").forEach(s => {
