@@ -360,7 +360,8 @@ html.cam-hover, html.cam-hover body { cursor: pointer; }
 html.cam-grab, html.cam-grab * { cursor: none !important; }
 html.cam-grab .cam3d { filter: blur(.8px) saturate(1.35) brightness(1.3); opacity: 1; }
 /* пока камера «большая» — хост шире и камера выходит поверх контента (под шапкой и пузырём) */
-html.cam-big .cam3d { width: min(115vw, 115vh, 1500px); z-index: 45; }
+html.cam-big .cam3d { width: min(115vw, 115vh, 1500px); }
+html.cam-front .cam3d { z-index: 45; }
 .cam-lock { position: fixed; inset: 0; z-index: 9998; cursor: none; }
 .cam-cursor {
   position: fixed; left: 0; top: 0; z-index: 9999; width: 20px; height: 28px;

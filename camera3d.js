@@ -350,12 +350,15 @@
       brows.add(b);
     });
     pivot.add(brows);
-    let big = 0, rage = 0, hostBig = false;
-    const kBigScale = 0.75, kBigBack = 1.2; // +75% размера (≈ полсайта с учётом перспективы); отодвигаем назад, чтобы не вылезало за кадр
+    let big = 0, rage = 0, hostBig = false, hostK = 1, curS = 1;
+    const kBigApparent = 2.6; // во сколько раз камера выглядит больше обычной в пик сцены (чуть меньше половины сайта)
+    const kBigBack = 0.9;     // отодвигаем назад при росте, чтобы не вылезала за кадр
+    const kBigFront = true;   // true = на время сцены камера выходит поверх контента; уходит за него, когда уже уменьшилась (false = всегда за контентом)
+    const kArmGlitch = 0.5;   // 0 = руки без багов, 1 = сильно «застревают в текстурах»
     const gl = { stuck: 0, next: 0.8 };    // «баги» рук: залипания кисти и проваливание локтей в корпус
     const bodyC = new T.Vector3();
     function setRage(r) {
-      cyanM.color.copy(CY0).lerp(RED, r); cyanM.emissive.copy(cyanM.color); cyanM.emissiveIntensity = 0.7 + r * 0.25;
+      cyanM.color.copy(CY0).lerp(RED, r); cyanM.emissive.copy(cyanM.color); cyanM.emissiveIntensity = (0.7 + r * 0.25) * (1 - 0.6 * Math.sin(Math.PI * r)); // на переходе объектив «притухает», а не вспыхивает белым
       pinkM.color.copy(PK0).lerp(RED, r * 0.6); pinkM.emissive.copy(pinkM.color);
       pupil.scale.set(1 - 0.65 * r, 1, 1 + 0.8 * r); // зрачок-щель
       brows.visible = r > 0.04; brows.scale.setScalar(Math.max(0.01, r));
@@ -389,8 +392,12 @@
       lock.style.display = "block"; fakeCur.style.display = "block";
       setFake(x, y, 0, 1, 1);
       armsGroup.visible = true;
-      hostBig = true; root.classList.add("cam-big");               // камера «раздувается»: хост больше, зум модели растёт в кадре
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25)); resize();
+      if (!hostBig) {                                              // хост крупнее для чёткости; модель на hostK меньше — кадр на старте и финише не прыгает
+        const w0 = host.clientWidth;
+        hostBig = true; root.classList.add("cam-big"); if (kBigFront) root.classList.add("cam-front");
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25)); resize();
+        hostK = w0 / Math.max(1, host.clientWidth);
+      }
       say(pick(GRAB[curLang()].scold), x, y);
       setTimeout(SFX.growl, 140);
     }
@@ -403,7 +410,7 @@
       const g = grab, t = (g.t += dt);
       pivot.updateWorldMatrix(true, false);
       if (!g.pc) g.pc = screenToWorld(g.x, g.y, 0.6, new T.Vector3());
-      const Sg = 1 + big * kBigScale;                            // текущий масштаб «раздутой» камеры
+      const Sg = curS;                                           // текущий масштаб модели
       holdP.set(0, 0.1, 2.7); pivot.localToWorld(holdP);        // «перед объективом»: сюда камера тащит курсор
       pos.copy(g.pc);
       const mx = mouse.active ? mouse.x : g.x, my = mouse.active ? mouse.y : g.y;
@@ -448,26 +455,27 @@
       const showArms = ext > 0.035;
       armsGroup.visible = showArms;
       if (showArms) {
+        const G = kArmGlitch;
         gl.next -= dt;
         if (gl.stuck > 0) gl.stuck -= dt;
-        else if (gl.next <= 0 && ext > 0.9) { gl.stuck = 0.12 + Math.random() * 0.22; gl.next = 0.3 + Math.random() * 0.6; }
+        else if (G > 0 && gl.next <= 0 && ext > 0.9) { gl.stuck = 0.1 + Math.random() * 0.15; gl.next = 0.8 + Math.random() * 1.0; }
         bodyC.set(0, 0, 0.1); pivot.localToWorld(bodyC);
         [[armL, SH_L, -0.1], [armR, SH_R, 0.1]].forEach(([a, sh, ox]) => {
           a.sh.copy(sh); pivot.localToWorld(a.sh);
-          a.sh.x += (Math.random() - 0.5) * 0.03 * Sg; a.sh.y += (Math.random() - 0.5) * 0.03 * Sg; // мелкая дрожь «багнутой» анимации
           tgt.set(pos.x + ox * Sg, pos.y - 0.05, pos.z + 0.02).sub(a.sh).multiplyScalar(Math.max(ext, 0.03)).add(a.sh);
-          if (gl.stuck > 0) {                                      // кисть «застряла в текстурах»: залипла на старом месте и дёргается
-            tgt.copy(a.tip).add(vTmp.set((Math.random() - 0.5) * 0.14 * Sg, (Math.random() - 0.5) * 0.14 * Sg, (Math.random() - 0.5) * 0.14 * Sg));
+          if (gl.stuck > 0) {                                      // кисть на миг «застревает»: держится на месте и мелко дрожит
+            tgt.copy(a.tip);
+            tgt.x += Math.sin(t * 47 + ox * 9) * 0.06 * Sg * G;
+            tgt.y += Math.sin(t * 53 + ox * 7) * 0.06 * Sg * G;
           } else a.tip.copy(tgt);
           a.ctrl.copy(a.sh).lerp(tgt, 0.5); a.ctrl.y -= 0.3 * ext * Sg; a.ctrl.x += Math.sign(sh.x) * 0.3 * Sg;
-          a.ctrl.lerp(bodyC, 0.4 * ext);                           // локоть проваливается в корпус — рука пробивает его насквозь
+          a.ctrl.lerp(bodyC, 0.4 * ext * G);                       // локоть чуть проваливается в корпус
           a.mesh.geometry.dispose();
           a.mesh.geometry = new T.TubeGeometry(new T.QuadraticBezierCurve3(a.sh, a.ctrl, tgt), 18, 0.07 * Sg, 8, false);
           a.hand.position.copy(tgt);
-          a.hand.scale.setScalar(Sg * (gl.stuck > 0 ? 0.75 + Math.random() * 0.7 : 1)); // кисть «мигает» размером
+          a.hand.scale.setScalar(Sg);
         });
       }
-
       if (!g.unlocked) {
         const sp = cx === null ? worldToScreen(pos) : { x: cx, y: cy };
         setFake(sp.x, sp.y, rot, sc, op);
@@ -513,14 +521,16 @@
       const gT = grab && !grab.unlocked ? 1 : 0;                   // пока идёт сцена — камера большая и злая
       big += (gT - big) * (1 - Math.exp(-dt * (gT ? 7 : 4)));
       rage += (gT - rage) * (1 - Math.exp(-dt * (gT ? 9 : 5)));
-      if (!gT && big < 0.01) big = 0;
+      if (!gT && big < 0.004) big = 0;
       if (!gT && rage < 0.01) rage = 0;
       if (!grab && hostBig && big === 0) {                          // сдулась — возвращаем хост и качество
-        hostBig = false; document.documentElement.classList.remove("cam-big");
+        hostBig = false; hostK = 1; document.documentElement.classList.remove("cam-big", "cam-front");
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); resize();
       }
+      if (!gT && big < 0.3) document.documentElement.classList.remove("cam-front"); // «за контент» уходит уже маленькой — скачка не видно
       setRage(rage);
-      const S = 1 + big * kBigScale;
+      const S = hostBig ? hostK * (1 + big * (kBigApparent - 1)) : 1; // на big=0 видимый размер = обычному, поэтому переключение хоста незаметно
+      curS = S;
       stand.scale.setScalar(S); wrap.position.z = stand.position.z = -big * kBigBack;
       kick = Math.max(0, kick - dt * 2.2);
       spin = Math.max(0, spin - dt * Math.PI * 2.4);
