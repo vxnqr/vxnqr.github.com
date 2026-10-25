@@ -117,6 +117,23 @@
     ru: "Всё-всё, у меня голова кружится! 🌀",
     en: "Okay okay, I'm getting dizzy! 🌀"
   };
+  const GRAB = {
+    ru: {
+      scold: ["Ноу, ноу, ноу! Так нельзя!", "А-ай-яй-яй! Ручками не трогать!", "Не тыкай в меня! Курсор конфискован!"],
+      toss: ["Брысь! Иди погуляй!", "Лети отсюда!", "Не мешай работать!"],
+      back: ["Ладно, держи. И больше не тыкай!", "Забирай. Но я за тобой слежу.", "Отдаю. Условно."]
+    },
+    en: {
+      scold: ["No, no, no! You can't do that!", "Tsk tsk! Hands off the camera!", "Don't poke me! Cursor confiscated!"],
+      toss: ["Scram! Go play somewhere else!", "Off you go!", "I'm working here!"],
+      back: ["Fine, take it back. No more poking!", "Here. But I'm watching you.", "Returned. Conditionally."]
+    }
+  };
+  const kGrabQuery = (location.search.match(/[?&]grab=(\w+)/) || [])[1]; // ?grab=1 | toss | hold — принудительно, для проверки
+  const kGrabChance = kGrabQuery ? 1 : 0.2;                               // шанс «ручек» на клик по камере
+  const kGrabForced = kGrabQuery === "toss" || kGrabQuery === "hold" ? kGrabQuery : null;
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const curLang = () => (document.documentElement.lang === "en" ? "en" : "ru");
   let clicks = 0, lastIdx = -1;
   function nextMessage() {
     clicks++;
@@ -210,15 +227,146 @@
 
     let kick = 0, spin = 0;
     window.addEventListener("click", e => {
-      if (interactive(e.target) || !hit(e.clientX, e.clientY)) return;
+      if (grab || interactive(e.target) || !hit(e.clientX, e.clientY)) return;
+      if (canGrab && e.pointerType !== "touch" && Math.random() < kGrabChance) { startGrab(e.clientX, e.clientY); return; }
       const m = nextMessage();
       say(m.text, e.clientX, e.clientY);
       kick = 1;
       if (m.spin) spin = Math.PI * 2;
     });
     window.addEventListener("pointermove", e => {
+      if (grab) return;
       document.documentElement.classList.toggle("cam-hover", !interactive(e.target) && hit(e.clientX, e.clientY));
     }, { passive: true });
+
+    /* ---- «ручки»: иногда камера хватает курсор, ругается и либо швыряет его, либо отдаёт ----
+       Настоящий курсор двигать нельзя: на время хвата прячем его, рисуем поддельную стрелку и ловим клики слоем-«замком». */
+    let grab = null, canGrab = false;
+    const lock = document.createElement("div");
+    lock.className = "cam-lock"; lock.style.display = "none";
+    const fakeCur = document.createElement("div");
+    fakeCur.className = "cam-cursor"; fakeCur.setAttribute("aria-hidden", "true"); fakeCur.style.display = "none";
+    fakeCur.innerHTML = '<svg width="20" height="28" viewBox="0 0 20 28"><path d="M2 2 L2 22 L7 17.5 L10.5 25.5 L14 24 L10.5 16.5 L17 16.5 Z" fill="#fff" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+    document.body.append(lock, fakeCur);
+    const setFake = (x, y, rot, sc, op) => {
+      fakeCur.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + rot.toFixed(1) + "deg) scale(" + sc.toFixed(3) + ")";
+      fakeCur.style.opacity = String(op);
+    };
+
+    const armM = new T.MeshStandardMaterial({ color: 0x2a1a4a, emissive: 0x8a2bff, emissiveIntensity: 0.35, metalness: 0.4, roughness: 0.5 });
+    const gloveM = new T.MeshStandardMaterial({ color: 0xffe9fb, emissive: 0xff2bd6, emissiveIntensity: 0.35, metalness: 0.1, roughness: 0.6 });
+    const armsGroup = new T.Group(); armsGroup.visible = false; scene.add(armsGroup);
+    function makeArm() {
+      const mesh = new T.Mesh(new T.BufferGeometry(), armM);
+      const hand = new T.Group();
+      const ball = (r, x, y, z) => { const b = new T.Mesh(new T.SphereGeometry(r, 12, 12), gloveM); b.position.set(x, y, z); hand.add(b); };
+      ball(0.17, 0, 0, 0); ball(0.065, -0.1, 0.16, 0); ball(0.065, 0, 0.2, 0); ball(0.065, 0.1, 0.16, 0); ball(0.06, 0.17, 0, 0.04);
+      armsGroup.add(mesh, hand);
+      return { mesh, hand, sh: new T.Vector3(), ctrl: new T.Vector3() };
+    }
+    const armL = makeArm(), armR = makeArm();
+    const SH_L = new T.Vector3(-0.56, -0.25, -0.1), SH_R = new T.Vector3(0.56, -0.25, -0.1); // «плечи» в системе камеры
+
+    const easeOut = x => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
+    const smooth = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+    const vTmp = new T.Vector3(), pos = new T.Vector3(), holdP = new T.Vector3(), tgt = new T.Vector3(), mw = new T.Vector3();
+    function screenToWorld(x, y, z, out) { // точка экрана → точка в плоскости z сцены
+      const r = host.getBoundingClientRect();
+      ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, cam);
+      const o = ray.ray.origin, d = ray.ray.direction, k = (z - o.z) / d.z;
+      return out.set(o.x + d.x * k, o.y + d.y * k, o.z + d.z * k);
+    }
+    function worldToScreen(v) {
+      const r = host.getBoundingClientRect();
+      vTmp.copy(v).project(cam);
+      return { x: r.left + (vTmp.x * 0.5 + 0.5) * r.width, y: r.top + (-vTmp.y * 0.5 + 0.5) * r.height };
+    }
+
+    function startGrab(x, y) {
+      const toss = kGrabForced ? kGrabForced === "toss" : Math.random() < 0.55;
+      grab = {
+        t: 0, x, y, kind: toss ? "toss" : "hold", dir: Math.random() < 0.5 ? -1 : 1,
+        retractStart: toss ? 2.25 : 3.4, // когда руки убираются
+        tLock: toss ? 3.7 : 3.4          // когда возвращаем курсор и снимаем «замок»
+      };
+      const root = document.documentElement;
+      root.classList.remove("cam-hover"); root.classList.add("cam-grab");
+      lock.style.display = "block"; fakeCur.style.display = "block";
+      setFake(x, y, 0, 1, 1);
+      armsGroup.visible = true;
+      say(pick(GRAB[curLang()].scold), x, y);
+    }
+    function unlock() {
+      document.documentElement.classList.remove("cam-grab");
+      lock.style.display = "none"; fakeCur.style.display = "none";
+    }
+
+    function updateGrab(dt) {
+      const g = grab, t = (g.t += dt);
+      pivot.updateWorldMatrix(true, false);
+      if (!g.pc) g.pc = screenToWorld(g.x, g.y, 0.6, new T.Vector3());
+      holdP.set(0, 0.1, 2.5); pivot.localToWorld(holdP);        // «перед объективом»: сюда камера тащит курсор
+      pos.copy(g.pc);
+      const mx = mouse.active ? mouse.x : g.x, my = mouse.active ? mouse.y : g.y;
+      let wag = 0, rot = 0, sc = 1, op = 1, cx = null, cy = null;
+
+      if (t >= 0.3) pos.lerp(holdP, smooth((t - 0.3) / 0.5));
+      if (t >= 0.3 && t < 2.0) {                                 // «ноу-ноу-ноу»: трясёт курсором и собой
+        wag = Math.sin((t - 0.3) * 14) * 0.3 * Math.min(1, (t - 0.3) / 0.3);
+        kick = 0.7;
+      }
+      rot = wag * 70;
+
+      if (g.kind === "toss") {
+        if (t >= 2.0 && t < 2.25) pos.x -= g.dir * 0.5 * smooth((t - 2.0) / 0.25); // замах
+        if (t >= 2.25) {
+          if (!g.flying) {                                       // бросок
+            g.flying = true;
+            const s0 = worldToScreen(pos);
+            g.fx = s0.x; g.fy = s0.y; g.rot = 0;
+            g.vx = g.dir * (900 + Math.random() * 600); g.vy = -(500 + Math.random() * 500);
+            say(pick(GRAB[curLang()].toss), g.x, g.y);
+          }
+          g.fx += g.vx * dt; g.fy += g.vy * dt; g.vy += 1800 * dt; g.rot += 900 * dt * g.dir;
+          cx = g.fx; cy = g.fy; rot = g.rot; sc = 1 - 0.5 * Math.min(1, (t - 2.25) / 1.0);
+          if (cx < -60 || cx > window.innerWidth + 60 || cy > window.innerHeight + 60) op = 0;
+          if (t >= 3.4) {                                        // курсор «возвращается» на место мыши
+            const k = smooth((t - 3.4) / 0.3);
+            cx = mx; cy = my; rot = 0; sc = 0.3 + 0.7 * k; op = 1;
+          }
+        }
+      } else {
+        if (t >= 2.0 && !g.said) { g.said = true; say(pick(GRAB[curLang()].back), g.x, g.y); }
+        if (t >= 2.9) {                                          // кладёт курсор обратно туда, где мышь
+          screenToWorld(mx, my, 0.6, mw);
+          pos.lerp(mw, smooth((t - 2.9) / 0.5));
+        }
+      }
+
+      let ext = t < 0.3 ? easeOut(t / 0.3) : 1;                  // насколько вытянуты руки
+      if (t > g.retractStart) ext *= 1 - easeOut((t - g.retractStart) / 0.45);
+      pos.x += wag;
+      const showArms = ext > 0.035;
+      armsGroup.visible = showArms;
+      if (showArms) {
+        [[armL, SH_L, -0.1], [armR, SH_R, 0.1]].forEach(([a, sh, ox]) => {
+          a.sh.copy(sh); pivot.localToWorld(a.sh);
+          tgt.set(pos.x + ox, pos.y - 0.05, pos.z + 0.02).sub(a.sh).multiplyScalar(Math.max(ext, 0.03)).add(a.sh);
+          a.ctrl.copy(a.sh).lerp(tgt, 0.5); a.ctrl.y -= 0.3 * ext; a.ctrl.x += Math.sign(sh.x) * 0.3;
+          a.mesh.geometry.dispose();
+          a.mesh.geometry = new T.TubeGeometry(new T.QuadraticBezierCurve3(a.sh, a.ctrl, tgt), 18, 0.07, 8, false);
+          a.hand.position.copy(tgt);
+        });
+      }
+
+      if (!g.unlocked) {
+        const sp = cx === null ? worldToScreen(pos) : { x: cx, y: cy };
+        setFake(sp.x, sp.y, rot, sc, op);
+      }
+      if (t >= g.tLock && !g.unlocked) { g.unlocked = true; unlock(); }
+      if (g.unlocked && !showArms) { armsGroup.visible = false; grab = null; }
+    }
 
     const aim = new T.Object3D();
     aim.rotation.order = "YXZ";
@@ -241,9 +389,10 @@
       if (host.clientWidth < 2) return; // скрыто на узком экране
 
       let yaw, pitch;
-      if (mouse.active) {
+      if (mouse.active || grab) {
         const r = host.getBoundingClientRect();
-        ({ yaw, pitch } = aimAngles(mouse.x - (r.left + r.width / 2), mouse.y - (r.top + r.height / 2), 500));
+        const ax = grab ? grab.x : mouse.x, ay = grab ? grab.y : mouse.y;
+        ({ yaw, pitch } = aimAngles(ax - (r.left + r.width / 2), ay - (r.top + r.height / 2), 500));
       } else { // курсора нет — камера лениво осматривается
         yaw = 0.35 + Math.sin(now / 1700) * 0.25;
         pitch = Math.sin(now / 2300) * 0.08;
@@ -251,6 +400,7 @@
       aim.rotation.set(-pitch, yaw, 0);
       pivot.quaternion.slerp(aim.quaternion, 1 - Math.exp(-dt * 8));
 
+      if (grab) updateGrab(dt);
       // реакция на клик: подпрыгивание-тряска и (раз в десять кликов) «бочка»
       kick = Math.max(0, kick - dt * 2.2);
       spin = Math.max(0, spin - dt * Math.PI * 2.4);
@@ -261,6 +411,7 @@
       ledM.color.setHex(ledOn ? 0xff3b3b : 0x4a1010);
       renderer.render(scene, cam);
     }
+    canGrab = true;
     requestAnimationFrame(frame);
   }
 

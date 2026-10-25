@@ -351,9 +351,20 @@ body {
   pointer-events: none;
   filter: blur(4px) saturate(1.3) brightness(1.5);                  /* «глаз» из-за стекла */
   opacity: .85;
+  transition: filter .35s ease, opacity .35s ease;
 }
 .cam3d canvas { width: 100%; height: 100%; display: block; }
-html.cam-hover, html.cam-hover body { cursor: pointer; } /* курсор-«рука» над моделью камеры */
+html.cam-hover, html.cam-hover body { cursor: pointer; }
+
+/* камера схватила курсор: настоящий прячем, ловим клики, камера «выходит на передний план» */
+html.cam-grab, html.cam-grab * { cursor: none !important; }
+html.cam-grab .cam3d { filter: blur(1.2px) saturate(1.3) brightness(1.7); opacity: 1; }
+.cam-lock { position: fixed; inset: 0; z-index: 9998; cursor: none; }
+.cam-cursor {
+  position: fixed; left: 0; top: 0; z-index: 9999; width: 20px; height: 28px;
+  pointer-events: none; transform-origin: 2px 2px; will-change: transform, opacity;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5));
+} /* курсор-«рука» над моделью камеры */
 
 /* ---------- 3D-плёнка по бокам: за фоном, в блюре ---------- */
 .film3d {
