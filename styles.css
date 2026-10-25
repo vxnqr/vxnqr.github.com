@@ -18,6 +18,13 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* текст не выделяется (двойной/тройной клик, протяжка, Ctrl+A), но всё кликается как обычно */
+html, body, body * {
+  -webkit-user-select: none; -moz-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+}
+img, a, video { -webkit-user-drag: none; user-drag: none; }
 html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
@@ -27,6 +34,14 @@ body {
   min-height: 100vh;
 }
 ::selection { background: var(--acid); color: var(--ink); }
+
+/* текст не выделяется (клики, ссылки и кнопки работают как обычно) */
+html, body, body * {
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;                 /* iOS: без меню копирования по долгому тапу */
+  -webkit-tap-highlight-color: transparent;
+}
+a, img, video { -webkit-user-drag: none; }
 :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
 /* ---------- background ---------- */
