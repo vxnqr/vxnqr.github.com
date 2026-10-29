@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InvoidHunter — админка: люди, аватарки, отзывы</title>
+<style>
+  :root {
+    --bg: #07040f; --ink: #07040f; --txt: #f4f0ff; --muted: #9a90b8;
+    --acid: #ff2bd6; --cyan: #22e5ff; --violet: #8a2bff;
+    --line: rgba(138, 43, 255, .35);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 20px 80px;
+    background: radial-gradient(900px 500px at 20% 0%, rgba(138,43,255,.18), transparent 70%), var(--bg);
+    color: var(--txt);
+    font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+  }
+  h1 { font-size: 24px; letter-spacing: .06em; margin: 0 0 6px; }
+  h1 b { color: var(--acid); }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 24px; max-width: 820px; }
+  .sub code { color: var(--cyan); }
+  .bar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 12px 14px; margin-bottom: 22px;
+    background: rgba(10, 6, 20, .92); backdrop-filter: blur(8px);
+    border: 1px solid var(--line); border-radius: 16px;
+  }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer;
+    padding: 9px 16px; border-radius: 999px;
+    border: 2px solid var(--ink); color: var(--ink);
+    background: linear-gradient(100deg, var(--acid), var(--violet) 70%);
+    box-shadow: 3px 3px 0 var(--cyan);
+  }
+  button.ghost { background: transparent; color: var(--txt); border-color: var(--line); box-shadow: none; }
+  button:hover { transform: translate(-1px, -1px); }
+  .status { color: var(--cyan); font-size: 13px; margin-left: auto; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: rgba(0,0,0,.35); }
+  .card h2 { font-size: 15px; margin: 0 0 4px; letter-spacing: .06em; word-break: break-all; }
+  .card .slug { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--cyan); margin: 0 0 12px; }
+  .row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .row > label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; min-width: 74px; padding-top: 12px; }
+  input[type="file"] { font-size: 12px; color: var(--muted); max-width: 100%; }
+  input[type="file"]::file-selector-button {
+    font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+    padding: 6px 12px; border-radius: 999px; margin-right: 8px;
+    border: 1px solid var(--line); background: rgba(138,43,255,.2); color: var(--txt);
+  }
+  .av { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .av .pic {
+    width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--line);
+    background: linear-gradient(135deg, var(--violet), var(--acid));
+    display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff;
+  }
+  .shots { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .shot { position: relative; width: 72px; height: 72px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .shot button {
+    position: absolute; top: 2px; right: 2px; padding: 0;
+    width: 20px; height: 20px; border-radius: 50%; font-size: 12px; line-height: 1;
+    background: var(--acid); border: 1px solid var(--ink); box-shadow: none;
+  }
+  .paths { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted); word-break: break-all; }
+  dialog {
+    border: 1px solid var(--line); border-radius: 16px; padding: 18px;
+    background: #0b0716; color: var(--txt); max-width: 760px; width: 92vw;
+  }
+  dialog textarea {
+    width: 100%; height: 320px; font-family: ui-monospace, Consolas, monospace; font-size: 12px;
+    background: #05030c; color: var(--cyan); border: 1px solid var(--line); border-radius: 10px; padding: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1><b>Invoid</b>Hunter — админка людей</h1>
+<p class="sub">
+  Карточки берутся из <code>index.html</code> по атрибуту <code>data-key</code>. Для каждой: аватарка и скрины отзывов —
+  <b>только изображения</b>. Цикл: выбрал файлы → «Скачать файлы» → разложил по путям →
+  «Скачать people.json» → залил на хостинг. Пути: <code>avatars/&lt;slug&gt;.jpg</code>,
+  <code>reviews/&lt;slug&gt;/1.jpg, 2.jpg…</code>
+</p>
+
+<div class="bar">
+  <button type="button" id="btn-files">Скачать файлы</button>
+  <button type="button" id="btn-json">Скачать people.json</button>
+  <button type="button" class="ghost" id="btn-show">Показать JSON</button>
+  <button type="button" class="ghost" id="btn-reset">Сбросить</button>
+  <span class="status" id="status"></span>
+</div>
+
+<div class="cards" id="cards"></div>
+
+<dialog id="json-dlg">
+  <h2 style="margin:0 0 10px;font-size:16px">people.json</h2>
+  <textarea id="json-out" readonly></textarea>
+  <div style="display:flex;gap:10px;margin-top:12px">
+    <button type="button" id="btn-copy">Скопировать</button>
+    <button type="button" class="ghost" id="btn-close">Закрыть</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+
+  const AVATAR_DIR = "avatars/";
+  const REVIEW_DIR = "reviews/";
+  const STORE = "ivh-admin-people";
+
+  const $ = s => document.querySelector(s);
+  const extOf = n => { const d = n.lastIndexOf("."); return d >= 0 ? n.slice(d + 1).toLowerCase() : ""; };
+
+  /* состояние: slug -> { avatarExt, avatarUrl, avatarFile, name, reviews:[{name,url,file}] } */
+  let state = {};
+  let slugs = [];
+  let names = {};
+
+  const status = msg => { $("#status").textContent = msg; };
+
+  function saveLocal() {
+    try {
+      const slim = {};
+      slugs.forEach(slug => {
+        const s = state[slug];
+        if (!s) return;
+        slim[slug] = {
+          avatarExt: s.avatarExt || "",
+          reviews: (s.reviews || []).map(r => ({ name: r.name }))
+        };
+      });
+      localStorage.setItem(STORE, JSON.stringify(slim));
+    } catch (e) { /* приватный режим / квота — не критично */ }
+  }
+
+  function loadLocal() {
+    try {
+      const raw = localStorage.getItem(STORE);
+      if (!raw) return {};
+      const j = JSON.parse(raw);
+      const out = {};
+      Object.keys(j).forEach(k => {
+        out[k] = {
+          avatarExt: j[k].avatarExt || "",
+          avatarUrl: "",
+          avatarFile: null,
+          reviews: (j[k].reviews || []).map(r => ({ name: r.name, url: "", file: null }))
+        };
+      });
+      return out;
+    } catch (e) { return {}; }
+  }
+
+  /* карточки людей — из самой страницы: <article class="person" data-key="slug"> */
+  function loadCards() {
+    return fetch("index.html?nocache=" + Date.now(), { cache: "no-store" })
+      .then(r => (r.ok ? r.text() : Promise.reject(r.status)))
+      .then(html => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const out = [];
+        const nm = {};
+        doc.querySelectorAll(".person[data-key]").forEach(el => {
+          const key = el.getAttribute("data-key");
+          if (!key || out.includes(key)) return;
+          out.push(key);
+          const h = el.querySelector("h3");
+          nm[key] = h ? h.textContent.trim() : key;
+        });
+        names = nm;
+        return out;
+      })
+      .catch(() => []);
+  }
+
+  function render() {
+    const box = $("#cards");
+    box.innerHTML = "";
+
+    slugs.forEach(slug => {
+      const s = state[slug] || (state[slug] = { avatarExt: "", avatarUrl: "", avatarFile: null, reviews: [] });
+
+      const card = document.createElement("section");
+      card.className = "card";
+
+      const h = document.createElement("h2");
+      h.textContent = names[slug] || slug;
+
+      const sl = document.createElement("p");
+      sl.className = "slug";
+      sl.textContent = slug;
+
+      /* аватарка */
+      const avRow = document.createElement("div");
+      avRow.className = "row";
+      const avLabel = document.createElement("label");
+      avLabel.textContent = "аватарка";
+      const avBox = document.createElement("div");
+      avBox.className = "av";
+
+      if (s.avatarUrl) {
+        const im = document.createElement("img");
+        im.className = "pic";
+        im.src = s.avatarUrl;
+        im.alt = "";
+        avBox.appendChild(im);
+      } else {
+        const ph = document.createElement("div");
+        ph.className = "pic";
+        ph.textContent = (slug.charAt(0) || "•").toUpperCase();
+        avBox.appendChild(ph);
+      }
+
+      const avInput = document.createElement("input");
+      avInput.type = "file";
+      avInput.accept = "image/*";
+      avInput.addEventListener("change", () => {
+        const f = avInput.files && avInput.files[0];
+        if (!f) return;
+        if (!f.type.startsWith("image/")) { status("только изображения"); avInput.value = ""; return; }
+        if (s.avatarUrl) URL.revokeObjectURL(s.avatarUrl);
+        s.avatarFile = f;
+        s.avatarExt = extOf(f.name) || "jpg";
+        s.avatarUrl = URL.createObjectURL(f);
+        saveLocal();
+        render();
+      });
+      avBox.appendChild(avInput);
+      avRow.append(avLabel, avBox);
+
+      /* отзывы */
+      const rvRow = document.createElement("div");
+      rvRow.className = "row";
+      const rvLabel = document.createElement("label");
+      rvLabel.textContent = "отзывы";
+      const rvWrap = document.createElement("div");
+      rvWrap.style.flex = "1";
+
+      const shots = document.createElement("div");
+      shots.className = "shots";
+      (s.reviews || []).forEach((r, idx) => {
+        const sh = document.createElement("div");
+        sh.className = "shot";
+        if (r.url) {
+          const im = document.createElement("img");
+          im.src = r.url;
+          im.alt = "";
+          sh.appendChild(im);
+        }
+        const del = document.createElement("button");
+        del.type = "button";
+        del.textContent = "×";
+        del.title = "удалить";
+        del.addEventListener("click", () => {
+          if (r.url) URL.revokeObjectURL(r.url);
+          s.reviews.splice(idx, 1);
+          saveLocal();
+          render();
+        });
+        sh.appendChild(del);
+        shots.appendChild(sh);
+      });
+
+      const rvInput = document.createElement("input");
+      rvInput.type = "file";
+      rvInput.accept = "image/*";
+      rvInput.multiple = true;
+      rvInput.addEventListener("change", () => {
+        const files = Array.from(rvInput.files || []);
+        const imgs = files.filter(f => f.type.startsWith("image/"));
+        if (imgs.length !== files.length) status("не-картинки отброшены: " + (files.length - imgs.length));
+        imgs.forEach(f => s.reviews.push({ name: f.name, url: URL.createObjectURL(f), file: f }));
+        saveLocal();
+        render();
+      });
+
+      rvWrap.append(shots, rvInput);
+      rvRow.append(rvLabel, rvWrap);
+
+      const hint = document.createElement("p");
+      hint.className = "paths";
+      hint.textContent = AVATAR_DIR + slug + ".jpg · " + REVIEW_DIR + slug + "/1.jpg…";
+
+      card.append(h, sl, avRow, rvRow, hint);
+      box.appendChild(card);
+    });
+
+    if (!slugs.length) {
+      box.innerHTML = '<p class="sub">Карточки не нашлись — открой админку с того же адреса, где лежит сайт (нужен http-сервер, не file://).</p>';
+    }
+  }
+
+  function buildJson() {
+    const people = {};
+    slugs.forEach(slug => {
+      const s = state[slug];
+      if (!s) return;
+      const avatar = s.avatarExt ? AVATAR_DIR + slug + "." + s.avatarExt : "";
+      const reviews = (s.reviews || []).map((r, i) => REVIEW_DIR + slug + "/" + (i + 1) + "." + (extOf(r.name) || "jpg"));
+      if (!avatar && !reviews.length) return;
+      const entry = {};
+      if (avatar) entry.avatar = avatar;
+      entry.reviews = reviews;
+      people[slug] = entry;
+    });
+    return { people };
+  }
+
+  function download(name, blob) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }
+
+  /* браузер может спросить «разрешить несколько загрузок» — это нормально */
+  async function downloadFiles() {
+    let n = 0;
+    for (const slug of slugs) {
+      const s = state[slug];
+      if (!s) continue;
+      if (s.avatarFile) {
+        download(slug + "." + (extOf(s.avatarFile.name) || "jpg"), s.avatarFile);
+        n++;
+        await new Promise(r => setTimeout(r, 320));
+      }
+      for (let i = 0; i < (s.reviews || []).length; i++) {
+        const r = s.reviews[i];
+        if (!r.file) continue;
+        download(slug + "-" + (i + 1) + "." + (extOf(r.name) || "jpg"), r.file);
+        n++;
+        await new Promise(res => setTimeout(res, 320));
+      }
+    }
+    status(n ? "скачано файлов: " + n : "нечего качать — файлы не выбраны");
+  }
+
+  $("#btn-files").addEventListener("click", downloadFiles);
+
+  $("#btn-json").addEventListener("click", () => {
+    download("people.json", new Blob([JSON.stringify(buildJson(), null, 2) + "\n"], { type: "application/json" }));
+    status("people.json скачан — положи в корень сайта");
+  });
+
+  $("#btn-show").addEventListener("click", () => {
+    $("#json-out").value = JSON.stringify(buildJson(), null, 2);
+    $("#json-dlg").showModal();
+  });
+  $("#btn-close").addEventListener("click", () => $("#json-dlg").close());
+  $("#btn-copy").addEventListener("click", () => {
+    navigator.clipboard.writeText($("#json-out").value).then(
+      () => status("JSON скопирован"),
+      () => status("не удалось скопировать")
+    );
+  });
+
+  $("#btn-reset").addEventListener("click", () => {
+    if (!confirm("Сбросить разметку аватарок и отзывов в этой админке?")) return;
+    Object.values(state).forEach(s => {
+      if (s.avatarUrl) URL.revokeObjectURL(s.avatarUrl);
+      (s.reviews || []).forEach(r => r.url && URL.revokeObjectURL(r.url));
+    });
+    state = {};
+    try { localStorage.removeItem(STORE); } catch (e) { /* ignore */ }
+    render();
+    status("сброшено");
+  });
+
+  loadCards().then(list => {
+    slugs = list;
+    state = loadLocal();
+    slugs.forEach(k => { if (!state[k]) state[k] = { avatarExt: "", avatarUrl: "", avatarFile: null, reviews: [] }; });
+    render();
+    status("людей: " + slugs.length);
+  });
+})();
+</script>
+</body>
+</html>

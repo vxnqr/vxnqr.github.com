@@ -10,64 +10,150 @@
     ru: {
       nav_works: "работы",
       nav_services: "услуги",
+      nav_people: "люди",
+      nav_reviews: "отзывы",
       nav_about: "о канале",
       hero_l1: "МОНТАЖ",
-      hero_l2: "ВИДЕО · ИГР",
+      hero_l2: "ВИДЕО",
       hero_sub: "Плотный рез без воды. Бит в синхроне, хук в первые три секунды, крафт в каждом кадре.",
       cta_order: "ЗАКАЗАТЬ МОНТАЖ ➤",
       cta_works: "СМОТРЕТЬ РАБОТЫ ↓",
       works_h: "РАБОТЫ",
       works_empty_1: "Пока пусто. Закинь файлы (.mp4 / .webm / .png / .jpg) в папку <b>media</b> рядом с сайтом и обнови страницу.",
       services_h: "УСЛУГИ",
-      s1_t: "КЛИПЫ И РОЛИКИ",
-      s1_d: "Плотный рез, динамика под бит, цвет и та самая грязь — видео, которое дожимают до конца.",
-      s1_p: "от 1 000 ₽",
-      s2_t: "ИГРОВОЙ МОНТАЖ",
-      s2_d: "Летсплеи, скилл-мешапы, клипы по моментам: тайминги под эмоции, а не по шаблону.",
-      s2_p: "от 1 500 ₽",
+      s1_t: "КЛИПЫ",
+      s1_d: "Присылаешь исходники — получаешь готовый ролик: чёткий ритм, чистый звук, ничего лишнего.",
+      s1_p: "500 ₽/мин",
+      s2_t: "МОНТАЖ ИГР",
+      s2_d: "Из твоих записей делаю нарезку с моментами, которые реально хочется пересмотреть.",
+      s2_p: "500 ₽/мин",
       s3_t: "ТРЕЙЛЕРЫ",
-      s3_d: "Кинематографический подход: темп, саунд-дизайн, титры, финальный удар под стингер.",
-      s3_p: "от 3 000 ₽",
+      s3_d: "Короткое кино из твоего материала: музыка, эффекты и концовка, после которой хочется пересмотреть.",
+      s3_p: "500 ₽/мин",
       s4_t: "ПРЕВЬЮ И АВАТАРЫ",
-      s4_d: "Стикеры, авы, миниатюры — визуал, который не отлипает от ленты.",
-      s4_p: "от 300 ₽",
-      footer_tag: "Монтаж видео и игр: клипы, шорты, трейлеры.",
+      s4_d: "Картинки для канала: обложки, аватарки, превью — чтобы на тебя кликали, а не пролистывали.",
+      s4_p: "500 ₽/мин",
+      footer_tag: "Монтаж видео",
       footer_about_h: "О КАНАЛЕ",
-      footer_about_d: "InvoidHunter — канал про монтаж видео и игровых роликов. Здесь свежие работы и приём заказов: клипы, шортсы, трейлеры, превью. Подпишись и напиши в Telegram — обсудим задачу и сроки.",
+      footer_about_d: "InvoidHunter — канал про монтаж видео. Здесь свежие работы и приём заказов: клипы, шортсы, трейлеры, превью. Подпишись и напиши в Telegram — обсудим задачу и сроки.",
       footer_hint: "Новые работы и заказы — в Telegram.",
       cta_join: "ПОДПИСАТЬСЯ ➤",
-      ticker: "МОНТАЖ ВИДЕО ✦ ИГРОВЫЕ ТРЕЙЛЕРЫ ✦ ЭКШН-РЕЗЫ ✦ SFX ✦ ШОРТС И РЕЛЫ ✦ ПРЕВЬЮ ✦ ДАВИНЧИ ✦ СИНХРОН БИТА ✦ "
+      ticker: "МОНТАЖ ВИДЕО ✦ ТРЕЙЛЕРЫ ✦ ЭКШН-РЕЗЫ ✦ SFX ✦ ШОРТС И РЕЛЫ ✦ ПРЕВЬЮ ✦ ДАВИНЧИ ✦ СИНХРОН БИТА ✦ ",
+      people_h: "ЛЮДИ",
+      people_sub: "С кем я работал: каналы, проекты, команды.",
+      pe1_t: "Mario Panamera",
+      pe1_d: "Моды и контент: ТГ-канал и DC-сервер с модами. 12,4 тыс. подписчиков.",
+      pe1_l: "t.me канала",
+      pe2_t: "Oleha77",
+      pe2_d: "Игровой контент. 231 тыс. подписчиков. С Олегом весело даже без контекста.",
+      pe2_l: "t.me/oleha77",
+      pe3_t: "keryllon",
+      pe3_d: "Majestic RP, промо KERYCH: 50.000$ и Premium. 909 подписчиков.",
+      pe3_l: "t.me/keryllon",
+      pe4_t: "benzino",
+      pe4_d: "Молодая канистра — DC bbenzino. 5,51 тыс. подписчиков.",
+      pe4_l: "t.me/benzino24",
+      pe5_t: "Апасный Канал",
+      pe5_d: "Стримы на твиче, продвижения смешного контента! 3,33 млн подписчиков 293 видео",
+      pe5_l: "youtube.com/@apasnayarykatv",
+      pe6_t: "Ты и я",
+      pe6_d: "Первый заказ — и здесь появится твоя карточка.",
+      pe6_l: "Напиши в Telegram",
+      reviews_h: "ОТЗЫВЫ",
+      reviews_sub: "Что говорят те, кто уже заказывал.",
+      reviews_empty: "Отзывов пока нет — стань первым!",
+      r_form_h: "ОСТАВИТЬ ОТЗЫВ",
+      r_name_ph: "Твоё имя или канал",
+      r_stars_aria: "Оценка",
+      r_text_ph: "Как прошла работа? Что понравилось, что нет?",
+      r_submit: "ОТПРАВИТЬ ➤",
+      r_hint: "Текст откроется в Telegram — вставь и отправь. Отзыв появится здесь после модерации.",
+      r_clip_ok: "Скопировано — вставь в чат и отправь!",
+      r_clip_fail: "Не удалось скопировать — выдели и скопируй текст вручную.",
+      r_min_len: "Напиши пару слов — так отзыв живее.",
+      r_vote_done: "Спасибо, отзыв отправлен!",
+      wr_reviews: "отзывы",
+      wr_none: "отзывов пока нет",
+      wr_one: "отзыв",
+      wr_few: "отзыва",
+      wr_many: "отзывов",
+      wr_open: "Открыть скриншот",
+      wr_close: "Закрыть",
+      wr_hint: "Скрины отзывов из Telegram — нажми, чтобы увеличить."
     },
     en: {
       nav_works: "works",
       nav_services: "services",
+      nav_people: "people",
+      nav_reviews: "reviews",
       nav_about: "about",
       hero_l1: "EDITING",
-      hero_l2: "VIDEO · GAMES",
+      hero_l2: "VIDEO",
       hero_sub: "Tight cuts, zero filler. Beat-synced, hooked in the first three seconds, crafted in every frame.",
       cta_order: "ORDER A CUT ➤",
       cta_works: "SEE THE WORKS ↓",
       works_h: "WORKS",
       works_empty_1: "Empty for now. Drop files (.mp4 / .webm / .png / .jpg) into the <b>media</b> folder next to the site and refresh.",
       services_h: "SERVICES",
-      s1_t: "CLIPS & EDITS",
-      s1_d: "Tight pacing, beat-driven dynamics, color and clean distortion — video people watch to the end.",
-      s1_p: "from $10",
+      s1_t: "CLIPS",
+      s1_d: "You send the raw files, you get a finished cut: tight rhythm, clean sound, nothing extra.",
+      s1_p: "$6/min",
       s2_t: "GAME EDITS",
-      s2_d: "Gameplay montages, skill mashups, moment clips: timing driven by emotion, not habit.",
-      s2_p: "from $15",
+      s2_d: "I turn your recordings into a montage with moments people actually rewatch.",
+      s2_p: "$6/min",
       s3_t: "TRAILERS",
-      s3_d: "Cinematic approach: tempo, sound design, titles, the final hit on the stinger.",
-      s3_p: "from $30",
+      s3_d: "A short film out of your footage: music, effects and an ending worth rewatching.",
+      s3_p: "$6/min",
       s4_t: "THUMBS & AVATARS",
-      s4_d: "Stickers, avatars, thumbnails — visuals that refuse to leave your feed.",
-      s4_p: "from $3",
-      footer_tag: "Video & game editing: clips, shorts, trailers.",
+      s4_d: "Pictures for the channel: covers, avatars, previews — so people click you, not scroll past.",
+      s4_p: "$6/min",
+      footer_tag: "Video editing",
       footer_about_h: "ABOUT",
-      footer_about_d: "InvoidHunter is a channel about video and game editing. Fresh works and open orders: clips, shorts, trailers, thumbnails. Subscribe and message on Telegram — we'll sort out the task and the timing.",
+      footer_about_d: "InvoidHunter is a channel about video editing. Fresh works and open orders: clips, shorts, trailers, thumbnails. Subscribe and message on Telegram — we'll sort out the task and the timing.",
       footer_hint: "New works and orders — on Telegram.",
       cta_join: "SUBSCRIBE ➤",
-      ticker: "VIDEO EDITING ✦ GAME TRAILERS ✦ ACTION CUTS ✦ SFX ✦ SHORTS & REELS ✦ THUMBNAILS ✦ DAVINCI ✦ BEAT SYNC ✦ "
+      ticker: "VIDEO EDITING ✦ TRAILERS ✦ ACTION CUTS ✦ SFX ✦ SHORTS & REELS ✦ THUMBNAILS ✦ DAVINCI ✦ BEAT SYNC ✦ ",
+      people_h: "PEOPLE",
+      people_sub: "Channels, projects and teams I've worked with.",
+      pe1_t: "Mario Panamera",
+      pe1_d: "Mods and content: TG channel and DC mod server. 12.4k subscribers.",
+      pe1_l: "channel on t.me",
+      pe2_t: "Oleha77",
+      pe2_d: "Gaming content. 231k subscribers. Fun even without context.",
+      pe2_l: "t.me/oleha77",
+      pe3_t: "keryllon",
+      pe3_d: "Majestic RP, KERYCH promo: $50k & Premium. 909 subscribers.",
+      pe3_l: "t.me/keryllon",
+      pe4_t: "benzino",
+      pe4_d: "Young canister — DC bbenzino. 5.51k subscribers.",
+      pe4_l: "t.me/benzino24",
+      pe5_t: "Vadya Forbes",
+      pe5_d: "Twitch streams, funny content promotion! 3.33M subscribers, 293 videos",
+      pe5_l: "youtube.com/@apasnayarykatv",
+      pe6_t: "You and me",
+      pe6_d: "Your first order — and your card shows up here.",
+      pe6_l: "Message me on Telegram",
+      reviews_h: "REVIEWS",
+      reviews_sub: "What clients say after working with me.",
+      reviews_empty: "No reviews yet — be the first!",
+      r_form_h: "LEAVE A REVIEW",
+      r_name_ph: "Your name or channel",
+      r_stars_aria: "Rating",
+      r_text_ph: "How did it go? What did you like, what didn't you?",
+      r_submit: "SEND ➤",
+      r_hint: "The text opens in Telegram — paste and send. Your review will appear here after moderation.",
+      r_clip_ok: "Copied — paste it in the chat and send!",
+      r_clip_fail: "Couldn't copy — select and copy the text manually.",
+      r_min_len: "Write a few words — the review feels alive.",
+      r_vote_done: "Thanks, review sent!",
+      wr_reviews: "reviews",
+      wr_none: "no reviews yet",
+      wr_one: "review",
+      wr_few: "reviews",
+      wr_many: "reviews",
+      wr_open: "Open screenshot",
+      wr_close: "Close",
+      wr_hint: "Telegram review screenshots — click to enlarge."
     }
   };
 
@@ -98,6 +184,14 @@
     $$("[data-i18n]").forEach(el => {
       const v = I18N[lang][el.dataset.i18n];
       if (v != null) el.innerHTML = v;
+    });
+    $$("[data-i18n-ph]").forEach(el => {               // placeholder'ы формы отзыва
+      const v = I18N[lang][el.dataset.i18nPh];
+      if (v != null) el.placeholder = v;
+    });
+    $$("[data-i18n-aria]").forEach(el => {             // aria-метки (звёзды)
+      const v = I18N[lang][el.dataset.i18nAria];
+      if (v != null) el.setAttribute("aria-label", v);
     });
     buildTicker();
     ["ru", "en"].forEach(l => {
@@ -369,6 +463,217 @@
     reveal(cards);
   }
 
+  /* ---------- ЛЮДИ: отзывы-скрины под карточкой + кликабельное открывание ----------
+     Источник привязок — people.json:
+       { "people": { "<slug из data-key>": { "avatar": "avatars/x.jpg",
+                                            "reviews": ["reviews/x/1.jpg"] } } }
+     Слаг = атрибут data-key у <article class="person"> в index.html.
+     Ключа нет в json — карточка живёт как раньше: статичная аватарка, без отзывов. */
+  let peopleData = {};
+
+  function pluralRu(n, one, few, many) {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+    return many;
+  }
+  function reviewCountLabel(n) {
+    if (!n) return t("wr_none");
+    if (lang === "ru") return n + " " + pluralRu(n, t("wr_one"), t("wr_few"), t("wr_many"));
+    return n + " " + (n === 1 ? t("wr_one") : t("wr_many"));
+  }
+
+  const reviewSrc = r => (typeof r === "string" ? r : ((r && (r.src || r.url || r.file)) || ""));
+  const reviewList = cfg => (cfg && Array.isArray(cfg.reviews) ? cfg.reviews.map(reviewSrc).filter(Boolean) : []);
+
+  /* ---------- лайтбокс: скрин на весь экран, листается стрелками ---------- */
+  let lb = null;
+  let lbItems = [];
+  let lbIndex = 0;
+
+  function ensureLightbox() {
+    if (lb) return lb;
+
+    lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+
+    const img = document.createElement("img");
+    img.className = "lb-img";
+    img.alt = "";
+
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "lb-close";
+    close.textContent = "\u00d7";
+    close.setAttribute("aria-label", t("wr_close"));
+
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "lb-nav lb-prev";
+    prev.textContent = "\u2039";
+
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "lb-nav lb-next";
+    next.textContent = "\u203a";
+
+    const counter = document.createElement("span");
+    counter.className = "lb-count";
+
+    lb.append(img, prev, next, close, counter);
+    lb.addEventListener("click", e => { if (e.target === lb) closeLightbox(); });
+    prev.addEventListener("click", e => { e.stopPropagation(); stepLightbox(-1); });
+    next.addEventListener("click", e => { e.stopPropagation(); stepLightbox(1); });
+    close.addEventListener("click", e => { e.stopPropagation(); closeLightbox(); });
+
+    document.addEventListener("keydown", e => {
+      if (!lb.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") stepLightbox(-1);
+      else if (e.key === "ArrowRight") stepLightbox(1);
+    });
+
+    document.body.appendChild(lb);
+    lb._img = img;
+    lb._prev = prev;
+    lb._next = next;
+    lb._count = counter;
+    return lb;
+  }
+
+  function paintLightbox() {
+    const box = ensureLightbox();
+    const src = lbItems[lbIndex];
+    if (!src) return;
+    box._img.src = src;
+    const many = lbItems.length > 1;
+    box._prev.hidden = !many;
+    box._next.hidden = !many;
+    box._count.textContent = many ? (lbIndex + 1) + " / " + lbItems.length : "";
+    box._count.hidden = !many;
+  }
+  function stepLightbox(d) {
+    if (lbItems.length < 2) return;
+    lbIndex = (lbIndex + d + lbItems.length) % lbItems.length;
+    paintLightbox();
+  }
+  function openLightbox(items, index) {
+    lbItems = (items || []).filter(Boolean);
+    if (!lbItems.length) return;
+    lbIndex = Math.max(0, Math.min(index || 0, lbItems.length - 1));
+    ensureLightbox().classList.add("open");
+    document.body.classList.add("lb-lock");
+    paintLightbox();
+  }
+  function closeLightbox() {
+    if (!lb) return;
+    lb.classList.remove("open");
+    document.body.classList.remove("lb-lock");
+    lb._img.removeAttribute("src");
+  }
+
+  /* полоса превью под карточкой человека.
+     Битые пути не превращаются в квадрат с alt-текстом: превью снимается с полосы,
+     а если не загрузилось ни одно — карточка показывает «отзывов пока нет». */
+  function buildPeopleReviews(name, shots) {
+    const strip = document.createElement("div");
+    strip.className = "person-reviews";
+
+    const showEmpty = () => {
+      strip.classList.add("is-empty");
+      strip.removeAttribute("aria-label");
+      strip.textContent = "";
+      const none = document.createElement("span");
+      none.className = "pr-none";
+      none.textContent = t("wr_none");
+      strip.appendChild(none);
+    };
+
+    if (!shots.length) { showEmpty(); return strip; }
+
+    let alive = shots.filter(Boolean);   // что реально открывать в лайтбоксе
+    strip.setAttribute("aria-label", t("wr_reviews"));
+
+    alive.forEach(src => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pr-shot";
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = name + " — " + t("wr_one");
+      img.loading = "lazy";
+      img.decoding = "async";
+
+      img.addEventListener("error", () => {
+        alive = alive.filter(s => s !== src);
+        btn.remove();
+        if (!alive.length) showEmpty();
+      }, { once: true });
+
+      btn.appendChild(img);
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox(alive, Math.max(0, alive.indexOf(src)));   // клик по скрину = открыть на весь экран
+      });
+      strip.appendChild(btn);
+    });
+    return strip;
+  }
+
+  function peopleEntry(key) {
+    if (!key) return null;
+    if (peopleData[key]) return peopleData[key];
+    const low = key.toLowerCase();
+    const hit = Object.keys(peopleData).find(k => k.toLowerCase() === low);
+    return hit ? peopleData[hit] : null;
+  }
+
+  function decoratePeople() {
+    $$(".person").forEach(card => {
+      const key = card.dataset.key;
+      if (!key) return;                    // карточка-приглашение «Ты и я» — без отзывов
+      const cfg = peopleEntry(key);
+
+      if (cfg && cfg.avatar) {
+        const box = $(".p-avatar", card);
+        if (box) {
+          const old = $("img", box);
+          if (old) old.remove();
+          const img = document.createElement("img");
+          img.src = cfg.avatar;
+          img.alt = "";
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.addEventListener("error", () => img.remove()); // файла нет — остаётся инициал
+          box.appendChild(img);
+        }
+      }
+
+      const shots = reviewList(cfg);
+      const name = ($("h3", card) || {}).textContent || key || "";
+      card.appendChild(buildPeopleReviews(name, shots));
+      card.classList.toggle("has-reviews", shots.length > 0);
+    });
+  }
+
+  const FALLBACK_PEOPLE = (() => {
+    const el = $("#people-fallback");
+    if (!el) return {};
+    try { return JSON.parse(el.textContent) || {}; }
+    catch (e) { return {}; }
+  })();
+
+  fetch("people.json?v=" + STAMP, { cache: "no-store" })
+    .then(r => (r.ok ? r.json() : null))
+    .catch(() => null)
+    .then(j => {
+      peopleData = (j && j.people && typeof j.people === "object") ? j.people : FALLBACK_PEOPLE;
+      decoratePeople();
+    });
+
   const FALLBACK_LIST = (() => {
     try { return JSON.parse($("#media-list-fallback").textContent); }
     catch (e) { return []; }
@@ -444,6 +749,31 @@
     });
   }
   reveal(services);
+
+  /* ---------- люди: та же реакция карточек, что у услуг ---------- */
+  const people = $$(".person");
+  if (!prm) {
+    people.forEach(s => {
+      s.addEventListener("pointermove", e => {
+        const r = s.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        s.style.setProperty("--dx", (px * 16).toFixed(1) + "px");
+        s.style.setProperty("--dy", (py * 12).toFixed(1) + "px");
+        s.style.setProperty("--rz", (px * 3).toFixed(2) + "deg");
+      });
+      s.addEventListener("pointerleave", () => {
+        s.style.setProperty("--dx", "0px");
+        s.style.setProperty("--dy", "0px");
+        s.style.setProperty("--rz", "0deg");
+      });
+    });
+  }
+  reveal(people);
+
+  /* ---------- отзывы живут только под карточками людей (people.json) ----------
+     Отдельной секции и формы на странице нет: скрины добавляются вручную. */
+  const t = key => (I18N[lang] && I18N[lang][key]) || I18N.ru[key];
 
   /* ---------- боковые рейки: скролл = playhead на таймлайне ---------- */
   const tc = $("#timecode");

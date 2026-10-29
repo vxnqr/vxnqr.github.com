@@ -285,16 +285,20 @@
     bubble.className = "cam-bubble";
     bubble.setAttribute("aria-hidden", "true");
     document.body.appendChild(bubble);
-    let hideTimer = 0;
-    function say(text, x, y) { // реплика появляется у курсора
-      bubble.textContent = text;
+    let hideTimer = 0, bubbleSticky = false;
+    function positionBubble(x, y) { // реплика у точки (x, y) — левые/нижние границы
       bubble.style.left = Math.max(8, Math.min(window.innerWidth - 238, x - 30)) + "px";
       bubble.style.bottom = Math.min(window.innerHeight - 60, window.innerHeight - y + 16) + "px";
+    }
+    function say(text, x, y, sticky) { // реплика у курсора; sticky = живёт за движущейся точкой (сцена «ручок»)
+      bubble.textContent = text;
+      bubbleSticky = !!sticky;
+      positionBubble(x, y);
       bubble.classList.remove("show");
       void bubble.offsetWidth; // перезапуск анимации при повторном клике
       bubble.classList.add("show");
       clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => bubble.classList.remove("show"), 3600);
+      hideTimer = setTimeout(() => { bubble.classList.remove("show"); bubbleSticky = false; }, 3600);
     }
 
     let kick = 0, spin = 0;
@@ -398,7 +402,7 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25)); resize();
         hostK = w0 / Math.max(1, host.clientWidth);
       }
-      say(pick(GRAB[curLang()].scold), x, y);
+      say(pick(GRAB[curLang()].scold), x, y, true); // sticky: будет ехать вместе с камерой/курсором
       setTimeout(SFX.growl, 140);
     }
     function unlock() {
@@ -431,7 +435,7 @@
             const s0 = worldToScreen(pos);
             g.fx = s0.x; g.fy = s0.y; g.rot = 0;
             g.vx = g.dir * (900 + Math.random() * 600); g.vy = -(500 + Math.random() * 500);
-            say(pick(GRAB[curLang()].toss), g.x, g.y); SFX.whoosh();
+            say(pick(GRAB[curLang()].toss), g.x, g.y, true); SFX.whoosh();
           }
           g.fx += g.vx * dt; g.fy += g.vy * dt; g.vy += 1800 * dt; g.rot += 900 * dt * g.dir;
           cx = g.fx; cy = g.fy; rot = g.rot; sc = 1 - 0.5 * Math.min(1, (t - 2.25) / 1.0);
@@ -442,7 +446,7 @@
           }
         }
       } else {
-        if (t >= 2.0 && !g.said) { g.said = true; say(pick(GRAB[curLang()].back), g.x, g.y); SFX.give(); }
+        if (t >= 2.0 && !g.said) { g.said = true; say(pick(GRAB[curLang()].back), g.x, g.y, true); SFX.give(); }
         if (t >= 2.9) {                                          // кладёт курсор обратно туда, где мышь
           screenToWorld(mx, my, 0.6, mw);
           pos.lerp(mw, smooth((t - 2.9) / 0.5));
@@ -475,6 +479,10 @@
           a.hand.position.copy(tgt);
           a.hand.scale.setScalar(Sg);
         });
+      }
+      if (bubbleSticky && bubble.classList.contains("show")) {   // реплика сцены живёт за точкой: курсором-пленником или летящим после броска
+        if (cx !== null) positionBubble(cx, cy);
+        else { const s2 = worldToScreen(pos); positionBubble(s2.x, s2.y); }
       }
       if (!g.unlocked) {
         const sp = cx === null ? worldToScreen(pos) : { x: cx, y: cy };

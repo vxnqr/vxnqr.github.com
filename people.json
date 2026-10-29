@@ -1,0 +1,34 @@
+{
+  "people": {
+    "mariopanamera": {
+      "avatar": "avatars/mariopanamera.jpg",
+      "reviews": [
+        "reviews/mariopanamera/1.png"
+      ]
+    },
+    "oleha77": {
+      "avatar": "avatars/oleha77.jpg",
+      "reviews": [
+        "reviews/oleha77/1.png"
+      ]
+    },
+    "keryllon": {
+      "avatar": "avatars/keryllon.jpg",
+      "reviews": [
+        "reviews/keryllon/1.png"
+      ]
+    },
+    "benzino24": {
+      "avatar": "avatars/benzino24.jpg",
+      "reviews": [
+        "reviews/benzino24/1.png"
+      ]
+    },
+    "apasnayarykatv": {
+      "avatar": "avatars/apasnayarykatv.jpg",
+      "reviews": [
+        "reviews/apasnayarykatv/1.png"
+      ]
+    }
+  }
+}
